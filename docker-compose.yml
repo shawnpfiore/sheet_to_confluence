@@ -1,0 +1,10 @@
+services:
+  sheet-sync:
+    build: .
+    env_file: .env
+    volumes:
+      - ./secrets:/secrets:ro
+      - ./logs:/logs
+    restart: "no"
+    # If VPN/Confluence requires host networking on Linux:
+    # network_mode: "host"

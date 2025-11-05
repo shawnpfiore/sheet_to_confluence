@@ -1,0 +1,11 @@
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.swp
+.env
+service-account.json
+logs/
+secrets/
+.vscode/
+.idea/
