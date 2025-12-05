@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "football-lesson-generator.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "football-lesson-generator.labels" . | nindent 4 }}
+data:
+  CONFLUENCE_BASE: {{ .Values.confluence.baseUrl | quote }}
+  PARENT_PAGE_ID: {{ .Values.confluence.parentPageId | quote }}
+
+  GOOGLE_SA_JSON: {{ .Values.google.saJsonPath | quote }}
+  SPREADSHEET_ID: {{ .Values.google.spreadsheetId | quote }}
+  SHEET_GID: {{ .Values.google.sheetGid | quote }}
+
+  OLLAMA_API_URL: {{ .Values.ollama.apiUrl | quote }}
+  OLLAMA_MODEL: {{ .Values.ollama.model | quote }}
+
+  DEBUG: {{ .Values.env.debug | quote }}

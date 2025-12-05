@@ -1,22 +1,28 @@
 FROM python:3.11-slim
 
-# System deps (optional but common for google client)
+WORKDIR /app
+
+# System deps (if needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Copy code
+COPY generate_lessons_from_sheet.py /app/generate_lessons_from_sheet.py
 
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Python deps
+RUN pip install --no-cache-dir \
+    requests \
+    google-api-python-client \
+    google-auth \
+    google-auth-httplib2
 
-# App code
-COPY sheet_to_confluence.py /app/sheet_to_confluence.py
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+# Helpful for logs
+ENV PYTHONUNBUFFERED=1
 
-# Non-root
-RUN useradd -m appuser
-USER appuser
+# Default envs (overridden by k8s if needed)
+# need to update using for MCP
+ENV OLLAMA_API_URL="https://thehive.tib.ad.ea.com/api/generate" \
+    OLLAMA_MODEL="codellama:7b"
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["python", "/app/generate_lessons_from_sheet.py"]

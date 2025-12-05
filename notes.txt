@@ -1,0 +1,41 @@
+
+Testing in the IDE
+
+$env:OLLAMA_API_URL = "https://thehive.tib.ad.ea.com/api/generate" #need to update using for MCP
+$env:OLLAMA_MODEL   = "codellama:7b"   # or codellama:13b, llama3.1, etc. You will need to update on the server and download them
+
+python .\test_ollama.py
+
+
+Testing using other llm
+
+$env:CONF_USER       = "sfiore@ea.com"
+$env:CONF_PASS       = "Laststandx3!@#$%"
+$env:CONFLUENCE_BASE = "https://confluence.ea.com"
+$env:PARENT_PAGE_ID  = "1329880121"
+
+$env:GOOGLE_SA_JSON  = "service-account.json"
+$env:SPREADSHEET_ID  = "1yxEJJG4vU9oc7Yed2OPsLRyulO36UiLDrJ1xUthCTYM"
+$env:SHEET_GID       = "0"
+
+# LLM config – Stage 1: native Ollama
+$env:LLM_BACKEND     = "ollama"
+$env:OLLAMA_API_URL  = "https://thehive.tib.ad.ea.com/api/generate" #need to update using for MCP
+$env:LLM_MODEL_TAG   = "codellama:7b"
+
+
+will copy to confluence
+docker compose up --abort-on-container-exit
+
+
+
+helm install football-lesson-generator ./helm/football-lesson-generator \
+  --namespace ea \
+  --create-namespace \
+  --set confluence.user="sfiore@ea.com" \
+  --set confluence.password="Laststandx3!@#$%"
+
+
+# To test manually
+kubectl create job --from=cronjob/RELEASE-NAME-football-lesson-generator manual-lesson-gen -n ea
+kubectl logs -l job-name=manual-lesson-gen -n ea
