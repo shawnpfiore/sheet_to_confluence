@@ -9,8 +9,8 @@ python .\test_ollama.py
 
 Testing using other llm
 
-$env:CONF_USER       = "sfiore@ea.com"
-$env:CONF_PASS       = "Laststandx3!@#$%"
+$env:CONF_USER       = ""
+$env:CONF_PASS       = ""
 $env:CONFLUENCE_BASE = "https://confluence.ea.com"
 $env:PARENT_PAGE_ID  = "1329880121"
 
@@ -32,8 +32,8 @@ docker compose up --abort-on-container-exit
 helm install football-lesson-generator ./helm/football-lesson-generator \
   --namespace ea \
   --create-namespace \
-  --set confluence.user="sfiore@ea.com" \
-  --set confluence.password="Laststandx3!@#$%"
+  --set confluence.user="" \
+  --set confluence.password=""
 
 
 # To test manually
