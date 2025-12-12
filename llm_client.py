@@ -14,7 +14,7 @@ LLM_BACKEND = os.getenv("LLM_BACKEND", "ollama").lower()
 
 # Native Ollama HTTP endpoint #need to update using for MCP
 # For Hive:
-#   https://thehive.tib.ad.ea.com/api/generate
+#   https://ollama.tib.ad.ea.com/api/generate
 # For local:
 #   http://localhost:11434/api/generate
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generate")

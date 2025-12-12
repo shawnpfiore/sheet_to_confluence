@@ -6,7 +6,7 @@ import urllib3
 # disable the HTTPS warning since you're using verify=False
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://thehive.tib.ad.ea.com/api/generate") #need to update using for MCP
+OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://ollama.tib.ad.ea.com/api/generate") #need to update using for MCP
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
 
 def call_ollama(prompt: str) -> str:

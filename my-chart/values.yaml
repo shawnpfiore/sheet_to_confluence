@@ -1,44 +1,59 @@
-namespace: ea
-
 image:
-  repository: registry.ea.com/football-lesson-gen  # <- CHANGE to your registry
+  repository: registry.ea.com/football-lesson-gen
   tag: latest
   pullPolicy: IfNotPresent
 
-schedule: "0 3 * * 1"  # every Monday at 03:00
+schedule: "0 3 * * 1"
 
 confluence:
   baseUrl: "https://confluence.ea.com"
-  parentPageId: "1329880121"
-  # These should be set via --set or in a separate values file, not committed
-  user: ""      # e.g. sfiore@ea.com
-  password: ""  # e.g. PAT or password
+  pageId: "1329880121"
+  existingSecretName: "football-lesson-generator-confluence"
+
+attachment:
+  filename: "football-course-outline.csv"
 
 google:
   spreadsheetId: "1yxEJJG4vU9oc7Yed2OPsLRyulO36UiLDrJ1xUthCTYM"
-  sheetGid: "0"
-  saJsonPath: "/secrets/service-account.json"
-  saSecretName: "google-service-account"  # pre-created Secret with service-account.json key
+  sheetGid: ""
+  saSecretName: "google-service-account"
+  saSecretKey: "service-account.json"
+  saMountPath: "/secrets/service-account.json"
+
+source:
+  kind: "sheet_values"
+  render: "FORMATTED_VALUE"
+  sheetTabName: "Curriculum"
+
+writeBack:
+  range: ""
+  template: "Last sync: {timestamp} | File: {filename} | Status: {status}"
+  appendLog: ""
 
 ollama:
-  apiUrl: "https://thehive.tib.ad.ea.com/api/generate" #need to update using for MCP
-  model: "codellama:7b"
+  apiUrl: "http://ollama:11434/api/generate"
+  model: "llama3.2:1b"
 
 env:
   debug: "0"
 
 serviceAccount:
   create: true
-  name: ""  # if empty, fullname + "-sa" will be used
+  name: ""
 
 resources: {}
-  # requests:
-  #   cpu: "250m"
-  #   memory: "512Mi"
-  # limits:
-  #   cpu: "1"
-  #   memory: "1Gi"
-
 nodeSelector: {}
 tolerations: []
 affinity: {}
+imagePullSecrets: []
+
+api:
+  enabled: true
+  port: 9101              # <-- change from 8000
+  serviceType: ClusterIP
+  ingress:
+    enabled: false         # keep internal-only for MCP inside cluster
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []

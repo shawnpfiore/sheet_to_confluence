@@ -2,18 +2,27 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "football-lesson-generator.fullname" . }}-config
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "football-lesson-generator.labels" . | nindent 4 }}
 data:
-  CONFLUENCE_BASE: {{ .Values.confluence.baseUrl | quote }}
-  PARENT_PAGE_ID: {{ .Values.confluence.parentPageId | quote }}
+  CONFLUENCE_BASE: {{ required "confluence.baseUrl is required" .Values.confluence.baseUrl | quote }}
+  PAGE_ID: {{ required "confluence.pageId is required" .Values.confluence.pageId | quote }}
+  ATTACHMENT_FILENAME: {{ required "attachment.filename is required" .Values.attachment.filename | quote }}
 
-  GOOGLE_SA_JSON: {{ .Values.google.saJsonPath | quote }}
-  SPREADSHEET_ID: {{ .Values.google.spreadsheetId | quote }}
-  SHEET_GID: {{ .Values.google.sheetGid | quote }}
+  SOURCE_KIND: {{ default "sheet_values" .Values.source.kind | quote }}
+  RENDER_OPT: {{ default "FORMATTED_VALUE" .Values.source.render | quote }}
 
-  OLLAMA_API_URL: {{ .Values.ollama.apiUrl | quote }}
-  OLLAMA_MODEL: {{ .Values.ollama.model | quote }}
+  GOOGLE_SA_JSON: {{ required "google.saMountPath is required" .Values.google.saMountPath | quote }}
+  SPREADSHEET_ID: {{ required "google.spreadsheetId is required" .Values.google.spreadsheetId | quote }}
+  SHEET_GID: {{ default "" .Values.google.sheetGid | quote }}
+  SHEET_TAB_NAME: {{ default "" .Values.source.sheetTabName | quote }}
 
-  DEBUG: {{ .Values.env.debug | quote }}
+  WRITE_BACK_RANGE: {{ default "" .Values.writeBack.range | quote }}
+  WRITE_BACK_TEMPLATE: {{ default "" .Values.writeBack.template | quote }}
+  APPEND_LOG: {{ default "" .Values.writeBack.appendLog | quote }}
+
+  OLLAMA_API_URL: {{ default "http://ollama:11434/api/generate" .Values.ollama.apiUrl | quote }}
+  OLLAMA_MODEL: {{ default "codellama:7b" .Values.ollama.model | quote }}
+
+  DEBUG: {{ default "0" .Values.env.debug | quote }}

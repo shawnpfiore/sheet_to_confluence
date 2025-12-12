@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "football-lesson-generator.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "football-lesson-generator.labels" . | nindent 4 }}
 spec:
@@ -20,28 +20,35 @@ spec:
         spec:
           serviceAccountName: {{ include "football-lesson-generator.serviceAccountName" . }}
           restartPolicy: OnFailure
+
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
           containers:
             - name: football-lesson-generator
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+              command: ["/app/entrypoint.sh"]
+
               envFrom:
                 - configMapRef:
                     name: {{ include "football-lesson-generator.fullname" . }}-config
                 - secretRef:
-                    name: {{ include "football-lesson-generator.fullname" . }}-confluence
+                    name: {{ required "confluence.existingSecretName is required" .Values.confluence.existingSecretName }}
+
               volumeMounts:
                 - name: google-sa
-                  mountPath: /secrets
+                  mountPath: {{ .Values.google.saMountPath }}
+                  subPath: {{ .Values.google.saSecretKey }}
                   readOnly: true
+
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
+
           volumes:
             - name: google-sa
               secret:
-                secretName: {{ .Values.google.saSecretName }}
-          nodeSelector:
-            {{- toYaml .Values.nodeSelector | nindent 12 }}
-          tolerations:
-            {{- toYaml .Values.tolerations | nindent 12 }}
-          affinity:
-            {{- toYaml .Values.affinity | nindent 12 }}
+                secretName: {{ required "google.saSecretName is required" .Values.google.saSecretName }}

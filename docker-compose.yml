@@ -6,5 +6,5 @@ services:
       - ./secrets:/secrets:ro
       - ./logs:/logs
     restart: "no"
-    # If VPN/Confluence requires host networking on Linux:
-    # network_mode: "host"
+    ports:
+      - "9101:9101"

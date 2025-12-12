@@ -164,14 +164,21 @@ def drive_list_files(drive, folder_id: str, query: Optional[str] = None) -> List
         raise RuntimeError(f"Drive list failed for folder {folder_id}: {e}")
 
 
+def normalize_table(values: List[List[str]]) -> List[List[str]]:
+    if not values:
+        return values
+    max_cols = max(len(r) for r in values)
+    return [r + [""] * (max_cols - len(r)) for r in values]
+
 def to_csv_utf8_bom(values: List[List[str]]) -> bytes:
-    """Convert a 2D list to CSV bytes with UTF-8 BOM (Excel/Confluence friendly)."""
+    values = normalize_table(values)
+
     output = io.StringIO()
     writer = csv.writer(output, lineterminator="\r\n")
     for row in values or []:
         writer.writerow([("" if v is None else str(v)) for v in row])
     data = output.getvalue()
-    return ("\ufeff" + data).encode("utf-8")  # prepend BOM
+    return ("\ufeff" + data).encode("utf-8")
 
 
 def rows_to_csv_utf8_bom(rows: List[List[str]]) -> bytes:

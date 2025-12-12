@@ -1,68 +1,60 @@
+{{- if .Values.api.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "my-chart.fullname" . }}
+  name: {{ include "football-lesson-generator.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "my-chart.labels" . | nindent 4 }}
+    {{- include "football-lesson-generator.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "my-chart.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "football-lesson-generator.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: api
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "my-chart.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app.kubernetes.io/name: {{ include "football-lesson-generator.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: api
+        {{- include "football-lesson-generator.labels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "football-lesson-generator.serviceAccountName" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "my-chart.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+              containerPort: {{ .Values.api.port }}
+
+          command: ["uvicorn"]
+          args: ["api_server:app", "--host", "0.0.0.0", "--port", "{{ .Values.api.port }}"]
+
+          envFrom:
+            - configMapRef:
+                name: {{ include "football-lesson-generator.fullname" . }}-config
+            - secretRef:
+                name: {{ required "confluence.existingSecretName is required" .Values.confluence.existingSecretName }}
+
+          volumeMounts:
+            - name: google-sa
+              mountPath: {{ .Values.google.saMountPath }}
+              subPath: {{ .Values.google.saSecretKey }}
+              readOnly: true
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
+
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: google-sa
+          secret:
+            secretName: {{ required "google.saSecretName is required" .Values.google.saSecretName }}
+{{- end }}

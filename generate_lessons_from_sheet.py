@@ -17,7 +17,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ---------- Env / config ----------
 
-OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://thehive.tib.ad.ea.com/api/generate") #need to update using for MCP
+OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://ollama.tib.ad.ea.com/api/generate") #need to update using for MCP
 # Use a known-good default; can be overridden via env
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "codellama:7b")
 

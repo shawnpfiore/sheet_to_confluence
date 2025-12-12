@@ -6,7 +6,7 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://thehive.tib.ad.ea.com/api/generate")
+OLLAMA_API_URL = os.environ.get("OLLAMA_API_URL", "https://ollama.tib.ad.ea.com/api/generate")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "codellama:7b")
 
 

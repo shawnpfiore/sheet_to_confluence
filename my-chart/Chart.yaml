@@ -1,6 +1,6 @@
 apiVersion: v2
 name: football-lesson-generator
-description: Generate Confluence lesson pages from a Google Sheet using Ollama
+description: Google Sheets/Drive → Confluence sync + MCP-callable API
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
