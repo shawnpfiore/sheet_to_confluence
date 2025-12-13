@@ -1,5 +1,5 @@
 image:
-  repository: registry.ea.com/football-lesson-gen
+  repository: sfiore915/sheet-to-confluence
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -49,10 +49,10 @@ imagePullSecrets: []
 
 api:
   enabled: true
-  port: 9101              # <-- change from 8000
+  port: 9101
   serviceType: ClusterIP
   ingress:
-    enabled: false         # keep internal-only for MCP inside cluster
+    enabled: false
     className: ""
     annotations: {}
     hosts: []
